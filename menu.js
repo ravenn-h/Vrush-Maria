@@ -986,10 +986,10 @@ global.menugallery = `╔──☉ *G A L L E R Y*
 `
 global.menupush = `
 ╔──☉ *P U S H* 
-│✎.pushkontak
-│✎.pushkontak2
-│✎.savekontak
-│✎.savekontak2
+│✎.pushcontacts
+│✎.pushcontacts2
+│✎.savecontacts
+│✎.savecontacts2
 ╚─────────────☉
 `
 global.menuanime = `
