@@ -6136,49 +6136,49 @@ break
 if (!isGroup) return reply(mess.group)
 var { soal, jawaban } = pickRandom(JSON.parse(fs.readFileSync('./Game/tebakkata.json')));
 console.log('Answer : '+jawaban)
-await reply(`*WORD GUESSING GAME*\n\nQuestion: ${soal}\nHint: ${monospace(jawaban.replace(/[b|c|d|f|g|h|j|k|l|m|n|p|q|r|s|t|v|w|x|y|z]/gi, '-'))}\nTime: ${gamewaktu} seconds`)
+await reply(`*WORD GUESSING GAME*\n\nQuestion: ${soal}\nHint: ${monospace(jawaban.replace(/[b|c|d|f|g|h|j|k|l|m|n|p|q|r|s|t|v|w|x|y|z]/gi, '-'))}\nTime: ${jtime} seconds`)
 tebakkata = {
 soal: soal,
 jawaban: jawaban.toLowerCase(),
 waktu: setTimeout(function () {
 if (tebakkata) reply(`Time's up!\n\nAnswer to the question:\n${monospace(soal)}\n\nIs: ${monospace(jawaban)}`);
 delete tebakkata
-}, gamewaktu * 1000)
+}, jtime * 1000)
 }
 break 
 case 'brainteaser': case 'asahotak': 
 if (!isGroup) return reply(mess.group)
 var { soal, jawaban } = pickRandom(JSON.parse(fs.readFileSync('./Game/asahotak.json')));
 console.log('Answer : '+jawaban)
-await reply(`*BRAIN TEASER GAME*\n\nQuestion: ${soal}\nHint: ${monospace(jawaban.replace(/[b|c|d|f|g|h|j|k|l|m|n|p|q|r|s|t|v|w|x|y|z]/gi, '-'))}\nTime: ${gamewaktu} seconds`)
+await reply(`*BRAIN TEASER GAME*\n\nQuestion: ${soal}\nHint: ${monospace(jawaban.replace(/[b|c|d|f|g|h|j|k|l|m|n|p|q|r|s|t|v|w|x|y|z]/gi, '-'))}\nTime: ${jtime} seconds`)
 asahotak = {
 soal: soal,
 jawaban: jawaban.toLowerCase(),
 waktu: setTimeout(function () {
 if (asahotak) reply(`Time's up!\n\nAnswer to the question:\n${monospace(soal)}\n\nIs: ${monospace(jawaban)}`);
 delete asahotak
-}, gamewaktu * 1000)
+}, jtime * 1000)
 }
 break           
 case 'arrangeword': case 'susunkata': 
 if (!isGroup) return reply(mess.group)
 var { soal, jawaban } = pickRandom(JSON.parse(fs.readFileSync('./Game/susunkata.json')));
 console.log('Answer : '+jawaban)
-await reply(`*WORD ARRANGEMENT GAME*\n\nQuestion: ${soal}\nHint: ${monospace(jawaban.replace(/[b|c|d|f|g|h|j|k|l|m|n|p|q|r|s|t|v|w|x|y|z]/gi, '-'))}\nTime: ${gamewaktu} seconds`)
+await reply(`*WORD ARRANGEMENT GAME*\n\nQuestion: ${soal}\nHint: ${monospace(jawaban.replace(/[b|c|d|f|g|h|j|k|l|m|n|p|q|r|s|t|v|w|x|y|z]/gi, '-'))}\nTime: ${jtime} seconds`)
 susunkata = {
 soal: soal,
 jawaban: jawaban.toLowerCase(),
 waktu: setTimeout(function () {
 if (asahotak) reply(`Time's up!\n\nAnswer to the question:\n${monospace(soal)}\n\nIs: ${monospace(jawaban)}`);
 delete susunkata
-}, gamewaktu * 1000)
+}, jtime * 1000)
 }
 break           
 case 'guesspicture': case 'tebakgambar':
 if (!isGroup) return reply(mess.group)
 var { img, jawaban, deskripsi } = pickRandom(JSON.parse(fs.readFileSync('./Game/tebakgambar.json')));
 console.log('Answer : '+jawaban)
-var teks1 = `*PICTURE GUESSING GAME*\n\nHint: ${monospace(jawaban.replace(/[b|c|d|f|g|h|j|k|l|m|n|p|q|r|s|t|v|w|x|y|z]/gi, '-'))}\nDescription: ${deskripsi}\nTime: ${gamewaktu} seconds`
+var teks1 = `*PICTURE GUESSING GAME*\n\nHint: ${monospace(jawaban.replace(/[b|c|d|f|g|h|j|k|l|m|n|p|q|r|s|t|v|w|x|y|z]/gi, '-'))}\nDescription: ${deskripsi}\nTime: ${jtime} seconds`
 await Hisoka.sendMessage(from, {image: {url: img}, caption: teks1}, {quoted: m})
 tebakgambar = {
 soal: img,
@@ -6186,35 +6186,35 @@ jawaban: jawaban.toLowerCase(),
 waktu: setTimeout(function () {
 if (tebakgambar) reply(`Time's up!\nThe answer is: ${tebakgambar2[from].jawaban}`);
 delete tebakgambar
-}, gamewaktu * 1000)
+}, jtime * 1000)
 }
 break
 case 'guessflag': case 'tebakbendera': 
 if (!isGroup) return reply(mess.group)
 var { soal, jawaban } = pickRandom(JSON.parse(fs.readFileSync('./Game/tebakbendera.json')));
 console.log('Answer : '+jawaban)
-await reply(`*FLAG GUESSING GAME*\n\nQuestion: ${soal}\nHint: ${monospace(jawaban.replace(/[b|c|d|f|g|h|j|k|l|m|n|p|q|r|s|t|v|w|x|y|z]/gi, '-'))}\nTime: ${gamewaktu} seconds`)
+await reply(`*FLAG GUESSING GAME*\n\nQuestion: ${soal}\nHint: ${monospace(jawaban.replace(/[b|c|d|f|g|h|j|k|l|m|n|p|q|r|s|t|v|w|x|y|z]/gi, '-'))}\nTime: ${jtime} seconds`)
 tebakbendera = {
 soal: soal,
 jawaban: jawaban.toLowerCase(),
 waktu: setTimeout(function () {
 if (tebakbendera[from]) reply(`Time's up!\n\nAnswer to the question:\n${monospace(soal)}\n\nIs: ${monospace(jawaban)}`);
 delete tebakbendera
-}, gamewaktu * 1000)
+}, jtime * 1000)
 }
 break
 case 'guesschemistry': case 'tebakkimia': 
 if (!isGroup) return reply(mess.group)
 var { soal, jawaban } = pickRandom(JSON.parse(fs.readFileSync('./Game/tebakkimia.json')));
 console.log('Answer : '+jawaban)
-await reply(`*BRAIN TEASER GAME*\n\nQuestion: ${soal}\nHint: ${monospace(jawaban.replace(/[b|c|d|f|g|h|j|k|l|m|n|p|q|r|s|t|v|w|x|y|z]/gi, '-'))}\nTime: ${gamewaktu} seconds`)
+await reply(`*BRAIN TEASER GAME*\n\nQuestion: ${soal}\nHint: ${monospace(jawaban.replace(/[b|c|d|f|g|h|j|k|l|m|n|p|q|r|s|t|v|w|x|y|z]/gi, '-'))}\nTime: ${jtime} seconds`)
 tebakkimia = {
 soal: soal,
 jawaban: jawaban.toLowerCase(),
 waktu: setTimeout(function () {
 if (asahotak) reply(`Time's up!\n\nAnswer to the question:\n${monospace(soal)}\n\nIs: ${monospace(jawaban)}`);
 delete tebakkimia
-}, gamewaktu * 1000)
+}, jtime * 1000)
 }
 break        
 case 'family': case 'family100': case 'f100': 
@@ -6228,7 +6228,7 @@ let iuhbs = fefsh.startsWith(' ') ? fefsh.replace(' ','') : fefsh
 let axsfh = iuhbs.endsWith(' ') ? iuhbs.replace(iuhbs.slice(-1), '') : iuhbs
 famil.push(axsfh.toLowerCase())
 }
-await reply(`*FAMILY 100 GAME*\n\nQuestion: ${soal}\nTotal Answers: ${jawaban.length}\n\nTime: ${gamewaktu} seconds`)
+await reply(`*FAMILY 100 GAME*\n\nQuestion: ${soal}\nTotal Answers: ${jawaban.length}\n\nTime: ${jtime} seconds`)
 family = {
 soal: soal,
 jawaban: famil,
@@ -6240,24 +6240,24 @@ for (let i of jwb){teks += `\n${i}`}
 reply(teks)
 delete family
 };
-}, gamewaktu * 1000)
+}, jtime * 1000)
 }
 
 break   
 
 // Store
 case "idch":
-case "cekidch": {
+case "checkch": {
 if (!text) return m.reply("channel link")
-if (!text.includes("https://whatsapp.com/channel/")) return m.reply("Link tautan tidak valid")
+if (!text.includes("https://whatsapp.com/channel/")) return m.reply("[×]Link invalid")
 let result = text.split('https://whatsapp.com/channel/')[1]
 let res = await Hisoka.newsletterMetadata("invite", result)
 let teks = `
 * *ID :* ${res.id}
-* *Nama :* ${res.name}
-* *Total Pengikut :* ${res.subscribers}
+* *Name :* ${res.name}
+* *Total followers :* ${res.subscribers}
 * *Status :* ${res.state}
-* *Verified :* ${res.verification == "VERIFIED" ? "Terverifikasi" : "Tidak"}
+* *Verified :* ${res.verification == "VERIFIED" ? "unknown" : "unknown"}
 `
 m.reply(teks)
 }
@@ -6292,45 +6292,11 @@ case 'sendgc': {
   m.reply('Successfully sent message')
 }
 break
-case "proses": {
-if (!isOwner) return reply(mess.owner)
-if (!q) return m.reply("jasa install panel")
-let teks = `\n📦 ${text}
-⏰ ${tanggal(Date.now())}
 
-*Testimoni :*
-${ch}\n`
-await Hisoka.sendMessage(m.chat, {text: teks, mentions: [m.sender], contextInfo: {
-externalAdReply: {
-title: `Payment Received ✅`, 
-body: `© Powered By ${namaowner}`, 
-thumbnailUrl: `https://files.catbox.moe/${['k3xvf0', '3w0llo', 'pkmiz6', '9gs4q5'][Math.floor(Math.random() * 4)]}.jpg`, 
-sourceUrl: ch,
-}}}, {quoted: null})
-}
-break
-case "done": {
-if (!isOwner) return reply(mess.owner)
-if (!q) return m.reply("jasa install panel")
-let teks = `\n📦 ${text}
-⏰ ${tanggal(Date.now())}
-
-*Testimoni :*
-${ch}
-\n`
-await Hisoka.sendMessage(m.chat, {text: teks, mentions: [m.sender], contextInfo: {
-externalAdReply: {
-title: `Transaksi Done ✅`, 
-body: `© Powered By ${namaowner}`, 
-thumbnailUrl: `https://files.catbox.moe/${['k3xvf0', '3w0llo', 'pkmiz6', '9gs4q5'][Math.floor(Math.random() * 4)]}.jpg`, 
-sourceUrl: ch,
-}}}, {quoted: null})
-}
-break
 case 'lits': case 'list': case 'store':{
 if (db_respon_list.length === 0) return reply(`No list messages in database yet`)
 if (!isAlreadyResponListGroup(m.chat, db_respon_list)) return reply(`No list messages registered in this group yet`)
-let teks = `Halo @${m.sender.split("@")[0]} berikut beberapa list yang tersedia saat ini.\n\n`
+let teks = `Halo @${m.sender.split("@")[0]} \n\n`
 for (let i of db_respon_list) {
 if (i.id === m.chat) {
 teks += `- ${i.key.toLowerCase()}\n`
@@ -6383,20 +6349,15 @@ updateResponList(m.chat, args3, args4, false, '-', db_respon_list)
 reply(`Successfully updated response list with key *${args3}*`)
 }
 break
-case 'pay': case 'payment': {
-if (!isPrivate) return reply(mess.private)
 
-await Hisoka.sendMessage(m.chat, {image: {url: qris }, caption: `dana : ${dana}\ngopay : ${gopay}`  }, {quoted: m})
-}
-break
 
 // Search
 case 'animesearch': {
- if (!text) return m.reply(`Example penggunaan: .${prefix}solo leveling`)
+ if (!text) return m.reply(`Example : .${prefix+command}solo leveling`)
     
     try {
         // Show loading indicator
-        await m.reply('🔍 Mencari anime...')
+        await m.reply('🔍 searching anime...')
         
         // Make API request
         const apiUrl = `https://flowfalcon.dpdns.org/anime/search?q=${encodeURIComponent(text)}`

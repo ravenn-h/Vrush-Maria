@@ -1176,16 +1176,13 @@ global.menugame = `
 `
 global.menustore = `
 ╔──☉ *S T O R E* 
-│✎.cekidch
+│✎.idch
 │✎.upch
 │✎.sendgc
-│✎.proses
-│✎.done
 │✎.list
 │✎.addlist
 │✎.dellist
 │✎.updatelist
-│✎.payment
 ╚─────────────☉
 `
 global.menuse = `

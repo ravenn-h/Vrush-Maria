@@ -73,7 +73,7 @@ global.packname = nama
 global.author = namaBot
 
 //
-global.gamewaktu = 60 // Game time
+global.jtime = 60 // Game time
 global.suit = {};
 global.tictactoe = {};
 global.petakbom = {};
