@@ -560,15 +560,15 @@ global.allmenu = `
 │✎.confess
 │✎.menfess
 ╰─────────────☉
-╭──☉ *G A M E* 
-│✎.tebakkata
-│✎.asahotak
-│✎.susunkata
-│✎.tebakgambar
-│✎.tebakbendera
-│✎.tebakkimia
+╔──☉ *G A M E* 
+│✎.guessword
+│✎.brainteaser
+│✎.arrangeword
+│✎.guesspicture
+│✎.guessflag
+│✎.guesschemistry
 │✎.family100
-╰─────────────☉
+╚─────────────☉
 ╭──☉ *S T O R E* 
 │✎.cekidch
 │✎.upch
@@ -1165,12 +1165,12 @@ global.menumenfess = `
 `
 global.menugame = `
 ╔──☉ *G A M E* 
-│✎.tebakkata
-│✎.asahotak
-│✎.susunkata
-│✎.tebakgambar
-│✎.tebakbendera
-│✎.tebakkimia
+│✎.guessword
+│✎.brainteaser
+│✎.arrangeword
+│✎.guesspicture
+│✎.guessflag
+│✎.guesschemistry
 │✎.family100
 ╚─────────────☉
 `

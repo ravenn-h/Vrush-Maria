@@ -6132,7 +6132,7 @@ break
 
 // Game
    
-               case 'guessword': case 'tebakkata': 
+               case 'guessword': 
 if (!isGroup) return reply(mess.group)
 var { soal, jawaban } = pickRandom(JSON.parse(fs.readFileSync('./Game/tebakkata.json')));
 console.log('Answer : '+jawaban)
@@ -6146,7 +6146,7 @@ delete tebakkata
 }, jtime * 1000)
 }
 break 
-case 'brainteaser': case 'asahotak': 
+case 'brainteaser': 
 if (!isGroup) return reply(mess.group)
 var { soal, jawaban } = pickRandom(JSON.parse(fs.readFileSync('./Game/asahotak.json')));
 console.log('Answer : '+jawaban)
@@ -6160,7 +6160,7 @@ delete asahotak
 }, jtime * 1000)
 }
 break           
-case 'arrangeword': case 'susunkata': 
+case 'arrangeword': 
 if (!isGroup) return reply(mess.group)
 var { soal, jawaban } = pickRandom(JSON.parse(fs.readFileSync('./Game/susunkata.json')));
 console.log('Answer : '+jawaban)
@@ -6174,7 +6174,7 @@ delete susunkata
 }, jtime * 1000)
 }
 break           
-case 'guesspicture': case 'tebakgambar':
+case 'guesspicture': 
 if (!isGroup) return reply(mess.group)
 var { img, jawaban, deskripsi } = pickRandom(JSON.parse(fs.readFileSync('./Game/tebakgambar.json')));
 console.log('Answer : '+jawaban)
@@ -6189,7 +6189,7 @@ delete tebakgambar
 }, jtime * 1000)
 }
 break
-case 'guessflag': case 'tebakbendera': 
+case 'guessflag': 
 if (!isGroup) return reply(mess.group)
 var { soal, jawaban } = pickRandom(JSON.parse(fs.readFileSync('./Game/tebakbendera.json')));
 console.log('Answer : '+jawaban)
@@ -6203,7 +6203,7 @@ delete tebakbendera
 }, jtime * 1000)
 }
 break
-case 'guesschemistry': case 'tebakkimia': 
+case 'guesschemistry':
 if (!isGroup) return reply(mess.group)
 var { soal, jawaban } = pickRandom(JSON.parse(fs.readFileSync('./Game/tebakkimia.json')));
 console.log('Answer : '+jawaban)
