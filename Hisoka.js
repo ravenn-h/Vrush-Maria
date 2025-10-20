@@ -232,11 +232,8 @@ buttons: [
                   description: foother, 
                   id: `.menupush`
                    },
-                {
-                  title: 'Menu Islam',
-                  description: foother, 
-                  id: `.menuislam`
-                   },
+                
+               
                 {
                   title: 'Menu Anime',
                   description: foother, 
@@ -1010,10 +1007,7 @@ HisokaReact()
 menureply(`${global.menupush}`)
 }
 break
-case "menuislam": {
-HisokaReact()
-menureply(`${global.menuislam}`)
-}
+
 break
 case "menuanime": {
 HisokaReact()
@@ -5026,208 +5020,7 @@ await fs.writeFileSync("./lib/database/contacts.vcf", "")
 }}
 break
 
-// ============Islam
-case 'prayertime': case 'jadwal-sholat':
-    case 'jadwalsholat': {
-      if (!text) return m.reply('Which city?')
-      try {
-        const {
-          jadwalSholat
-        } = require('./lib/scraper')
-        const jadwal = await jadwalSholat(text.toLowerCase().replace(/\s+/g, '-'))
-        if (jadwal.error) return m.reply(jadwal.error)
-
-        const jdwl = `
-*PRAYER SCHEDULE FOR TODAY*
-Date: ${jadwal.tanggal}
-- Subuh: ${jadwal.subuh}
-- Dhuha: ${jadwal.duha}
-- Dzuhur: ${jadwal.dzuhur}
-- Ashar: ${jadwal.ashar}
-- Maghrib: ${jadwal.maghrib}
-- Isya: ${jadwal.isya}
-`.trim()
-
-        m.reply(jdwl)
-      } catch (err) {
-        console.error(err)
-        m.reply('An error occurred: ' + err)
-      }
-    }
-    break
-
-    case 'asmaulhusna': {
-      try {
-        let jir = await fetchJson('https://islamic-api-zhirrr.vercel.app/api/asmaulhusna')
-        let ye = jir.data
-
-        let tks = '*ASMAUL HUSNA*\n\n' + ye.map((item) => {
-          return `Urutan: ${item.index}\nLatin: ${item.latin}\nArab: ${item.arabic}\nIndonesian Translation: ${item.translation_id}\nEnglish Translation: ${item.translation_en}\n`
-        }).join('\n')
-
-        m.reply(tks)
-      } catch (err) {
-        console.error(err)
-        m.reply('Error cuy, coba lagi ntar!')
-      }
-    }
-    break
-
-    case 'niat-sholat':
-    case 'niatsholat': {
-      try {
-        let jir = await fetchJson('https://islamic-api-zhirrr.vercel.app/api/niatshalat')
-        let niatSholat = jir
-
-        if (!text) {
-          let daftarNiat = '*DAFTAR NIAT SHOLAT*\n\n' + niatSholat.map((item) => `- ${item.name}`).join('\n')
-          daftarNiat += '\n\nKetik *.niatsholat [nama sholat]* untuk melihat niat, contoh: *.niatsholat subuh*'
-          m.reply(daftarNiat)
-        } else {
-          let hasil = niatSholat.find((item) => item.name.toLowerCase().includes(text.toLowerCase()))
-
-          if (hasil) {
-            let tks = `*${hasil.name.toUpperCase()}*\n\n` +
-              `Arab: ${hasil.arabic}\n` +
-              `Latin: ${hasil.latin}\n` +
-              `Terjemahan: ${hasil.terjemahan}`
-            m.reply(tks)
-          } else {
-            m.reply('Niat sholat yang lu cari ga ketemu cuy. Cek lagi nama sholatnya!')
-          }
-        }
-      } catch (err) {
-        console.error(err)
-        m.reply('Error cuy, coba lagi ntar!')
-      }
-    }
-    break
-
-    case 'surah': {
-      try {
-        if (!text) {
-          m.reply('Type the surah number! Example: *.surah 1* to get verses from Al-Fatihah')
-          return
-        }
-
-        let response = await fetchJson(`https://api.siputzx.my.id/api/s/surah?no=${text}`)
-        let data = response.data
-
-        if (data.length > 0) {
-          let surahText = data.map((ayat, index) =>
-            `Ayat ${index + 1}:\n` +
-            `Arab: ${ayat.arab}\n` +
-            `Latin: ${ayat.latin}\n` +
-            `Terjemahan: ${ayat.indo}\n`
-          ).join('\n\n')
-
-          m.reply(surahText)
-        } else {
-          m.reply('Gak ketemu, cek lagi nomor surahnya!')
-        }
-      } catch (err) {
-        console.error(err)
-        m.reply('An error occurred: ' + err)
-      }
-    }
-    break
-
-    case 'doa':
-    case 'berdoa': {
-      try {
-        let jir = await fetchJson('https://doa-doa-api-ahmadramadhan.fly.dev/api')
-        let daftarDoa = jir
-
-        if (!text) {
-          let listDoa = '*DAFTAR DOA*\n\n' + daftarDoa.map((item) => `- ${item.doa}`).join('\n')
-          listDoa += '\n\nKetik *.doa [nama doa]* untuk melihat doa, contoh: *.doa doa sebelum tidur*'
-          m.reply(listDoa)
-        } else {
-          let hasil = daftarDoa.find((item) => item.doa.toLowerCase().includes(text.toLowerCase()))
-
-          if (hasil) {
-            let tks = `*${hasil.doa.toUpperCase()}*\n\n` +
-              `Ayat: ${hasil.ayat}\n` +
-              `Latin: ${hasil.latin}\n` +
-              `Artinya: ${hasil.artinya}`
-            m.reply(tks)
-          } else {
-            m.reply('Doa yang lu cari ga ketemu cuy. Cek lagi nama doanya!')
-          }
-        }
-      } catch (err) {
-        console.error(err)
-        m.reply('Error cuy, coba lagi ntar!')
-      }
-    }
-    break
-
-    case 'gislam': {
-      if (!text) return m.reply('Mau cari tentang apa?')
-      async function islam(query) {
-        try {
-          const response = await fetchJson(`https://artikel-islam.netlify.app/.netlify/functions/api/ms?page=1&s=${(query)}`)
-          if (response.success) {
-            const articles = response.data.data
-            let message = `Total artikel: ${articles.length}\n\n`
-            articles.forEach((article, index) => {
-              message += `${index + 1}. Judul: ${article.title}\nURL: ${article.url}\n\n`
-            })
-            return message
-          } else {
-            return 'Gagal mengambil data'
-          }
-        } catch (error) {
-          return 'Terjadi kesalahan saat mengambil data'
-        }
-      }
-      let lp = await islam(text)
-      m.reply(lp)
-    }
-    break
-
-    case 'kataislam': {
-      async function AI(content) {
-        try {
-          const response = await axios.post('https://luminai.my.id/', {
-            content,
-            cName: "S-AI",
-            cID: "S-AIbAQ0HcC"
-          });
-
-          return response.data
-        } catch (error) {
-          console.error(error)
-          throw error
-        }
-      }
-      let qe = 'Berikan satu kata-kata atau quotes Islamic random yang sangat memotivasi, dan menginspirasi, jawab langsung ke intinya!'
-      let qo = await AI(qe)
-      m.reply(qo.result)
-    }
-    break
-
-    case 'pantunislam': {
-      async function AI(content) {
-        try {
-          const response = await axios.post('https://luminai.my.id/', {
-            content,
-            cName: "S-AI",
-            cID: "S-AIbAQ0HcC"
-          });
-
-          return response.data
-        } catch (error) {
-          console.error(error)
-          throw error
-        }
-      }
-      let qe = 'Give one random Islamic pantun that is very motivating and inspiring, answer directly to the point!'
-      let qo = await AI(qe)
-      m.reply(qo.result)
-    }
-    break
-    
+//
     // Maker
     case 'text2img':
 case 'txt2img': {

@@ -401,18 +401,6 @@ global.allmenu = `
 │✎.savekontak
 │✎.savekontak2
 ╰─────────────☉
-╭──☉ *I S L A M* 
-│✎.jadwalsholat
-│✎.alquran
-│✎.asmaulhusna
-│✎.niatsholat
-│✎.surah
-│✎.berdoa
-│✎.ayatkursi
-│✎.gislam
-│✎.kataislam
-│✎.pantunislam
-╰─────────────☉
 ╭──☉ *A N I M E* 
 │✎.akiyama
 │✎.ana
@@ -1002,20 +990,6 @@ global.menupush = `
 │✎.pushkontak2
 │✎.savekontak
 │✎.savekontak2
-╚─────────────☉
-`
-global.menuislam = `
-╔──☉ *I S L A M* 
-│✎.jadwalsholat
-│✎.alquran
-│✎.asmaulhusna
-│✎.niatsholat
-│✎.surah
-│✎.berdoa
-│✎.ayatkursi
-│✎.gislam
-│✎.kataislam
-│✎.pantunislam
 ╚─────────────☉
 `
 global.menuanime = `
