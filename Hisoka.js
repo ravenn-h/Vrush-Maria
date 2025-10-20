@@ -1463,7 +1463,7 @@ break
 
 case "delowner": case "delown": {
 if (!isOwner) return reply(mess.owner)
-if (!m.quoted && !text) return m.reply("6285###")
+if (!m.quoted && !text) return m.reply("2255###")
 const input = m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, "") + "@s.whatsapp.net"
 const input2 = input.split("@")[0]
 if (input2 === global.owner || input == botNumber) return m.reply(`Cannot remove main owner!`)
@@ -1476,7 +1476,7 @@ m.reply(`Successfully removed owner ✅`)
 break
 case "addowner": case "addown": {
 if (!isOwner) return reply(mess.owner)
-if (!m.quoted && !text) return m.reply("6285###")
+if (!m.quoted && !text) return m.reply("2255###")
 const input = m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, "") + "@s.whatsapp.net"
 const input2 = input.split("@")[0]
 if (input2 === global.owner || owner.includes(input) || input === botNumber) return m.reply(`Number ${input2} is already bot owner!`)
@@ -1509,7 +1509,7 @@ Hisoka.sendMessage(m.chat, {text: teks, mentions: premium}, {quoted: qcontacts})
 break
 case "addprem": {
 if (!isOwner) return reply(mess.owner)
-if (!text && !m.quoted) return reply("6285###")
+if (!text && !m.quoted) return reply("2255###")
 const input = m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, "") + "@s.whatsapp.net"
 const input2 = input.split("@")[0]
 if (input2 === global.owner || premium.includes(input) || input === botNumber) return reply(`𝘕𝘰𝘮𝘰𝘳 ${input2} 𝘴𝘶𝘥𝘢𝘩 𝘔𝘦𝘯𝘫𝘢𝘥𝘪 𝘗𝘳𝘦𝘮𝘪𝘶𝘮!`)
@@ -1519,7 +1519,7 @@ await fs.writeFileSync("./lib/database/premium.json", JSON.stringify(premium, nu
 break
 case "delprem": {
     if (!isOwner) return reply(mess.owner)
-if (!m.quoted && !text) return reply("6285###")
+if (!m.quoted && !text) return reply("2255###")
 const input = m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, "") + "@s.whatsapp.net"
 const input2 = input.split("@")[0]
 if (input2 == global.owner || input == botNumber) return m.reply(`Delete success`)
@@ -1925,7 +1925,7 @@ await Hisoka.groupParticipantsUpdate(m.chat, [target], action.toLowerCase()).the
 await Hisoka.sendMessage(m.chat, {text: `Successfully ${action.toLowerCase()}d @${target.split("@")[0]}`, mentions: [target]}, {quoted: m})
 })
 } else {
-return m.reply("@tag/6285###")
+return m.reply("@tag/2255###")
 }
 }
 
@@ -6090,12 +6090,12 @@ break
 case"confes": case "menfes":case 'menfess': case 'confess': {
 if (!isPrivate) return reply(`Private chat only!!`)
       global.menfess = global.menfess ? global.menfess : {}
-      if (!text) return reply(` ${prefix + command} 628xxxxx | orang | Bayar Utang Lu`)
+      if (!text) return reply(` ${prefix + command} 225xxxxx | name | hi`)
       let [jid, name, msg] = text.split`|`
-      if ((!jid || !name || !msg)) return reply(`${prefix + command} 628xxxxx | orang | Bayar Utang Lu`)
+      if ((!jid || !name || !msg)) return reply(`${prefix + command} 225xxxxx | name | hi`)
       let p = (await Hisoka.onWhatsApp(jid))[0] || {}
       if (!p.exists) return reply('❌ The number you entered is incorrect')
-      if (p.jid == m.sender) return reply('Itu Nomer Lu Dodol!!')
+      if (p.jid == m.sender) return reply('err !!')
       let mf = Object.values(global.menfess).find(mf => mf.status === true)
       if (mf) return !0
          let heri = `${monospa(`${name.trim()}`)}`
