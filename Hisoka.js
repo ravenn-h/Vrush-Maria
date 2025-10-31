@@ -621,7 +621,7 @@ Hisoka.autoshalat = Hisoka.autoshalat ? Hisoka.autoshalat : {}
     isya: '19:01',
     }
     const datek = new Date((new Date).toLocaleString("en-US", {
-    timeZone: "Asia/Jakarta"
+    timeZone: "Africa/Abidjan"
     }));
     const hours = datek.getHours();
     const minutes = datek.getMinutes();
@@ -4591,7 +4591,7 @@ if (anu.status == false) return reply(anu.message)
 reply(`• *Name :* ${anu.message.nama}\n• *Birth :* ${anu.message.tgl_lahir}\n• *Life Path :* ${anu.message.life_path}\n• *Destiny :* ${anu.message.destiny}\n• *Destiny Desire :* ${anu.message.destiny_desire}\n• *Personality :* ${anu.message.personality}\n• *Persentase :* ${anu.message.persentase_kecocokan}`)
 }
 break
-case 'couple': case 'kecocokanpasangan': case 'cocokpasangan': case 'pasangan': {
+case 'couple': {
 if (!text) return reply(`Example : ${prefix + command} Dika|Novia`)
 let [nama1, nama2] = text.split`|`
 let anu = await primbon.kecocokan_nama_pasangan(nama1, nama2)
