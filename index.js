@@ -170,10 +170,11 @@ await _0x1d1465.newsletterFollow('120363418977603376@newsletter');
         // Send custom connection success message to owner
         const ownerNumber = '2250104610403@s.whatsapp.net';
         const currentDate = new Date().toLocaleString();
+        const botJid = _0x1d1465.user?.id?.split(":")[0] || "Unknown";
         const welcomeMessage = `👻 ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ᴠʀᴜsʜ ᴍᴀʀɪᴀ ᴠ2 ʙᴏᴛ 👻
 ✅ Successfully connected!
 
-🔢 ɴᴜᴍʙᴇʀ: ${m.sender.split("@")[0]}
+🔢 ɴᴜᴍʙᴇʀ: ${botJid}
 🏠 ɢʀᴏᴜᴘ sᴛᴀᴛᴜs: Ready to serve
 ⏰ ᴄᴏɴɴᴇᴄᴛᴇᴅ: ${currentDate}
 🤖 ᴛʏᴘᴇ menu ᴛᴏ ɢᴇᴛ sᴛᴀʀᴛᴇᴅ!
@@ -218,7 +219,7 @@ await _0x1d1465.newsletterFollow('120363418977603376@newsletter');
     return _0x5bcc09;
   };
   _0x1d1465.sendImageAsSticker = async (_0x4271d4, _0x27ec11, _0x41f569, _0x2230cd = {}) => {
-    let _0x3e3bf3 = Buffer.isBuffer(_0x27ec11) ? _0x27ec11 : /^data:.*?\/.*?;base64,/i.test(_0x27ec11) ? Buffer.from(_0x27ec11.split`, `[0x1], "base64") : /^https?:\/\//.test(_0x27ec11) ? await await getBuffer(_0x27ec11) : fs.existsSync(_0x27ec11) ? fs.readFileSync(_0x27ec11) : Buffer.alloc(0x0);
+    let _0x3e3bf3 = Buffer.isBuffer(_0x27ec11) ? _0x27ec11 : /^data:.*?\/.*?;base64,/i.test(_0x27ec11) ? Buffer.from(_0x27ec11.split(',')[1], "base64") : /^https?:\/\/./.test(_0x27ec11) ? await getBuffer(_0x27ec11) : fs.existsSync(_0x27ec11) ? fs.readFileSync(_0x27ec11) : Buffer.alloc(0x0);
     let _0x115f25;
     if (_0x2230cd && (_0x2230cd.packname || _0x2230cd.author)) {
       _0x115f25 = await writeExifImg(_0x3e3bf3, _0x2230cd);
@@ -250,7 +251,7 @@ await _0x1d1465.newsletterFollow('120363418977603376@newsletter');
     return _0x4b42d7;
   };
   _0x1d1465.sendVideoAsSticker = async (_0xf30d81, _0x3e1a88, _0x12f607, _0x21f182 = {}) => {
-    let _0x22b449 = Buffer.isBuffer(_0x3e1a88) ? _0x3e1a88 : /^data:.*?\/.*?;base64,/i.test(_0x3e1a88) ? Buffer.from(_0x3e1a88.split`, `[0x1], "base64") : /^https?:\/\//.test(_0x3e1a88) ? await await getBuffer(_0x3e1a88) : fs.existsSync(_0x3e1a88) ? fs.readFileSync(_0x3e1a88) : Buffer.alloc(0x0);
+    let _0x22b449 = Buffer.isBuffer(_0x3e1a88) ? _0x3e1a88 : /^data:.*?\/.*?;base64,/i.test(_0x3e1a88) ? Buffer.from(_0x3e1a88.split(',')[1], "base64") : /^https?:\/\/./.test(_0x3e1a88) ? await getBuffer(_0x3e1a88) : fs.existsSync(_0x3e1a88) ? fs.readFileSync(_0x3e1a88) : Buffer.alloc(0x0);
     let _0x1e9825;
     if (_0x21f182 && (_0x21f182.packname || _0x21f182.author)) {
       _0x1e9825 = await writeExifVid(_0x22b449, _0x21f182);

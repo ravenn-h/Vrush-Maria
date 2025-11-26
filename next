@@ -1,0 +1,640 @@
+Excellente question ! Oui, **chaque sous-session nécessite son propre pairing code** car chaque session = un numéro WhatsApp différent.
+
+Voici le code modifié pour que :
+1. ✅ Seul le bot principal démarre automatiquement
+2. ✅ Les sous-bots se créent uniquement via commande après déploiement
+3. ✅ Commande `addsession` pour ajouter un sous-bot
+4. ✅ Commande `pair` pour obtenir le pairing code d'un sous-bot
+
+## 📝 Code modifié
+
+### 1. **index.js - Version Multi-Session Améliorée**
+
+```javascript
+console.clear();
+console.log("© Vrush Maria v2 - Multi Session by Raven-Hisoka");
+require("./config");
+
+const {
+  default: makeWASocket,
+  useMultiFileAuthState,
+  DisconnectReason,
+  makeCacheableSignalKeyStore
+} = require('@whiskeysockets/baileys');
+
+const fs = require('fs');
+const pino = require('pino');
+const cfonts = require("cfonts");
+
+// Stocker toutes les instances de bots
+const activeBots = new Map();
+const pendingPairings = new Map(); // Sessions en attente de pairing
+
+// Affichage du banner
+cfonts.say("Vrush Maria v2", {
+  font: "block",
+  align: "left",
+  colors: ["#ff00ff", "white"],
+  background: "transparent",
+  rawMode: false
+});
+
+// Configuration - Seul le bot principal démarre automatiquement
+const MAIN_SESSION = {
+  id: "main",
+  name: "Main Bot",
+  sessionPath: "./sessions/main",
+  isActive: true
+};
+
+// Fonction pour créer les dossiers de sessions
+function ensureSessionDir(sessionPath) {
+  if (!fs.existsSync('./sessions')) {
+    fs.mkdirSync('./sessions');
+  }
+  if (!fs.existsSync(sessionPath)) {
+    fs.mkdirSync(sessionPath, { recursive: true });
+  }
+}
+
+// Fonction principale pour démarrer une session
+async function startSession(sessionId, sessionName, sessionPath, phoneNumber = null) {
+  console.log(`\n🚀 Starting ${sessionName} (${sessionId})...`);
+  
+  try {
+    ensureSessionDir(sessionPath);
+    
+    const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
+    
+    const socket = makeWASocket({
+      printQRInTerminal: false,
+      syncFullHistory: true,
+      markOnlineOnConnect: true,
+      connectTimeoutMs: 60000,
+      defaultQueryTimeoutMs: 0,
+      keepAliveIntervalMs: 10000,
+      generateHighQualityLinkPreview: true,
+      
+      patchMessageBeforeSending: (message) => {
+        const requiresPatch = !!(message.buttonsMessage || message.templateMessage || message.listMessage);
+        if (requiresPatch) {
+          message = {
+            viewOnceMessage: {
+              message: {
+                messageContextInfo: {
+                  deviceListMetadataVersion: 2,
+                  deviceListMetadata: {}
+                },
+                ...message
+              }
+            }
+          };
+        }
+        return message;
+      },
+      
+      version: [4, 0, 0],
+      browser: ["Ubuntu", "Chrome", "20.0.04"],
+      logger: pino({ level: 'fatal' }),
+      auth: {
+        creds: state.creds,
+        keys: makeCacheableSignalKeyStore(
+          state.keys, 
+          pino().child({ level: 'silent', stream: "store" })
+        )
+      }
+    });
+
+    // Métadonnées de la session
+    socket.sessionId = sessionId;
+    socket.sessionName = sessionName;
+    socket.sessionPath = sessionPath;
+
+    // Gestion du pairing pour nouvelles sessions
+    if (!socket.authState.creds.registered) {
+      console.log(`⏳ ${sessionName} waiting for pairing...`);
+      
+      // Si c'est le bot principal, demander le numéro maintenant
+      if (sessionId === 'main') {
+        const readline = require('readline');
+        const rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout
+        });
+        
+        phoneNumber = await new Promise(resolve => {
+          rl.question(`\n📱 Enter phone number for Main Bot: `, resolve);
+        });
+        rl.close();
+      }
+      
+      // Si un numéro est fourni, générer le pairing code
+      if (phoneNumber) {
+        const pairingCode = await socket.requestPairingCode(phoneNumber);
+        console.log(`\n✅ Pairing Code for ${sessionName}: ${pairingCode}\n`);
+        
+        // Stocker dans les pairings en attente
+        pendingPairings.set(sessionId, {
+          code: pairingCode,
+          phone: phoneNumber,
+          timestamp: Date.now(),
+          socket: socket
+        });
+      } else {
+        // Stocker la socket en attente de pairing
+        pendingPairings.set(sessionId, {
+          socket: socket,
+          timestamp: Date.now()
+        });
+      }
+    }
+
+    // Décoder les JIDs
+    socket.decodeJid = (jid) => {
+      if (!jid) return jid;
+      if (/:\d+@/gi.test(jid)) {
+        const { jidDecode } = require('@whiskeysockets/baileys');
+        let decoded = jidDecode(jid) || {};
+        return decoded.user && decoded.server && decoded.user + '@' + decoded.server || jid;
+      }
+      return jid;
+    };
+
+    // Gestion des messages
+    socket.ev.on('messages.upsert', async (chatUpdate) => {
+      try {
+        const message = chatUpdate.messages[0];
+        if (!message.message) return;
+        
+        message.message = Object.keys(message.message)[0] === 'ephemeralMessage' 
+          ? message.message.ephemeralMessage.message 
+          : message.message;
+        
+        if (message.key && message.key.remoteJid === 'status@broadcast') return;
+        if (message.key.id.startsWith("BAE5") && message.key.id.length === 16) return;
+        if (message.key.id.startsWith("FatihArridho_")) return;
+        
+        // Passer les infos de session au handler
+        const { smsg } = require('./lib/myfunction');
+        const formattedMessage = smsg(socket, message, null);
+        formattedMessage.sessionId = sessionId;
+        formattedMessage.sessionName = sessionName;
+        formattedMessage.isMainBot = sessionId === 'main';
+        
+        require('./Hisoka.js')(socket, formattedMessage, chatUpdate, null);
+      } catch (error) {
+        console.log(`Error in ${sessionName}:`, error);
+      }
+    });
+
+    // Mise à jour des contacts
+    socket.ev.on("contacts.update", (update) => {
+      for (let contact of update) {
+        let id = socket.decodeJid(contact.id);
+        // Store contact info if needed
+      }
+    });
+
+    // Gestion de la connexion
+    socket.ev.on('connection.update', async (update) => {
+      const { connection, lastDisconnect } = update;
+      
+      if (connection === "open") {
+        console.log(`✅ ${sessionName} connected successfully!`);
+        
+        // Retirer des pairings en attente
+        pendingPairings.delete(sessionId);
+        
+        // Ajouter aux bots actifs
+        activeBots.set(sessionId, socket);
+        
+        // Message de bienvenue au owner
+        const ownerNumber = global.ownerNumber + '@s.whatsapp.net';
+        const welcomeMessage = `🤖 *${sessionName}* Connected!
+        
+🆔 Session: \`${sessionId}\`
+📱 Number: ${socket.user.id.split("@")[0]}
+⏰ Time: ${new Date().toLocaleString()}
+✅ Status: Active & Ready
+
+${sessionId === 'main' ? '👑 Main Bot' : '🔹 Sub-Bot'}
+
+Type *.menu* to start!`;
+        
+        try {
+          await socket.sendMessage(ownerNumber, { text: welcomeMessage });
+        } catch (err) {
+          console.log(`Failed to send welcome message for ${sessionName}`);
+        }
+      }
+      
+      if (connection === "close") {
+        const statusCode = lastDisconnect?.error?.output?.statusCode 
+          || lastDisconnect?.error?.statusCode 
+          || DisconnectReason.connectionClosed;
+        
+        if (statusCode !== DisconnectReason.loggedOut) {
+          console.log(`🔄 Reconnecting ${sessionName}...`);
+          setTimeout(() => startSession(sessionId, sessionName, sessionPath), 5000);
+        } else {
+          console.log(`❌ ${sessionName} logged out.`);
+          activeBots.delete(sessionId);
+          pendingPairings.delete(sessionId);
+        }
+      }
+    });
+
+    // Événements de groupe
+    socket.ev.on('group-participants.update', async (update) => {
+      await (await import('./gc.js')).default(socket, update);
+    });
+
+    socket.ev.on("creds.update", saveCreds);
+    
+    socket.public = true;
+    
+    return socket;
+    
+  } catch (error) {
+    console.error(`❌ Failed to start ${sessionName}:`, error);
+    return null;
+  }
+}
+
+// Fonction pour générer un pairing code pour une session existante
+async function generatePairingCode(sessionId, phoneNumber) {
+  const pending = pendingPairings.get(sessionId);
+  
+  if (!pending) {
+    return { success: false, message: "Session not found in pending pairings" };
+  }
+  
+  try {
+    const pairingCode = await pending.socket.requestPairingCode(phoneNumber);
+    
+    // Mettre à jour les infos
+    pendingPairings.set(sessionId, {
+      ...pending,
+      code: pairingCode,
+      phone: phoneNumber,
+      timestamp: Date.now()
+    });
+    
+    return { 
+      success: true, 
+      code: pairingCode,
+      phone: phoneNumber,
+      sessionId: sessionId
+    };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+}
+
+// Fonction pour créer une nouvelle session (commande addsession)
+async function createNewSession(sessionId, sessionName) {
+  // Vérifier si la session existe déjà
+  if (activeBots.has(sessionId) || pendingPairings.has(sessionId)) {
+    return { success: false, message: "Session already exists" };
+  }
+  
+  // Vérifier l'ID
+  if (!/^[a-z0-9_-]+$/i.test(sessionId)) {
+    return { success: false, message: "Invalid session ID. Use only letters, numbers, _ and -" };
+  }
+  
+  const sessionPath = `./sessions/${sessionId}`;
+  
+  try {
+    await startSession(sessionId, sessionName, sessionPath);
+    
+    return { 
+      success: true, 
+      message: `Session "${sessionName}" created! Use .pair ${sessionId} <phone> to get pairing code`,
+      sessionId: sessionId
+    };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+}
+
+// Fonction pour obtenir le statut de toutes les sessions
+function getSessionsStatus() {
+  const sessions = {
+    active: [],
+    pending: []
+  };
+  
+  // Sessions actives
+  for (const [sessionId, bot] of activeBots.entries()) {
+    sessions.active.push({
+      id: sessionId,
+      name: bot.sessionName,
+      number: bot.user?.id?.split("@")[0],
+      connected: true,
+      isMain: sessionId === 'main'
+    });
+  }
+  
+  // Sessions en attente de pairing
+  for (const [sessionId, data] of pendingPairings.entries()) {
+    sessions.pending.push({
+      id: sessionId,
+      name: data.socket?.sessionName || 'Unknown',
+      phone: data.phone || 'Not set',
+      code: data.code || 'Not generated',
+      timestamp: data.timestamp
+    });
+  }
+  
+  return sessions;
+}
+
+// Fonction pour arrêter une session
+async function stopSession(sessionId) {
+  if (sessionId === 'main') {
+    return { success: false, message: "Cannot stop main bot" };
+  }
+  
+  const bot = activeBots.get(sessionId);
+  if (bot) {
+    try {
+      await bot.logout();
+      activeBots.delete(sessionId);
+      
+      // Supprimer le dossier de session
+      const sessionPath = `./sessions/${sessionId}`;
+      if (fs.existsSync(sessionPath)) {
+        fs.rmSync(sessionPath, { recursive: true, force: true });
+      }
+      
+      return { success: true, message: `Session ${sessionId} stopped and removed` };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  }
+  
+  // Vérifier dans les pending
+  if (pendingPairings.has(sessionId)) {
+    pendingPairings.delete(sessionId);
+    const sessionPath = `./sessions/${sessionId}`;
+    if (fs.existsSync(sessionPath)) {
+      fs.rmSync(sessionPath, { recursive: true, force: true });
+    }
+    return { success: true, message: `Pending session ${sessionId} removed` };
+  }
+  
+  return { success: false, message: "Session not found" };
+}
+
+// Exporter les fonctions
+module.exports = {
+  startSession,
+  createNewSession,
+  generatePairingCode,
+  stopSession,
+  getSessionsStatus,
+  activeBots,
+  pendingPairings
+};
+
+// Démarrer uniquement le bot principal au lancement
+async function initialize() {
+  console.log("🤖 Initializing Vrush Maria v2 Multi-Session Bot...\n");
+  await startSession(MAIN_SESSION.id, MAIN_SESSION.name, MAIN_SESSION.sessionPath);
+  console.log("\n✅ Main bot started! Use commands to add sub-bots.\n");
+}
+
+initialize();
+
+// Auto-reload
+let file = require.resolve(__filename);
+require('fs').watchFile(file, () => {
+  require('fs').unwatchFile(file);
+  console.log("\x1b[32m" + __filename + " \x1b[1;32mupdated!\x1b[0m");
+  delete require.cache[file];
+  require(file);
+});
+```
+
+### 2. **Commandes dans Hisoka.js**
+
+```javascript
+// Dans votre fichier Hisoka.js, ajoutez ces commandes
+
+case 'sessions':
+case 'listsessions':
+case 'bots': {
+  if (!isOwner) return reply('❌ Owner only!');
+  
+  const { getSessionsStatus } = require('./index.js');
+  const sessions = getSessionsStatus();
+  
+  let text = '🤖 *MULTI-SESSION STATUS*\n\n';
+  
+  // Sessions actives
+  text += '✅ *ACTIVE SESSIONS* (' + sessions.active.length + ')\n';
+  text += '━━━━━━━━━━━━━━━━━\n';
+  
+  if (sessions.active.length > 0) {
+    sessions.active.forEach((s, i) => {
+      text += `\n${i + 1}. ${s.isMain ? '👑' : '🔹'} *${s.name}*\n`;
+      text += `   🆔 ID: \`${s.id}\`\n`;
+      text += `   📱 Number: ${s.number}\n`;
+      text += `   ✅ Status: Connected\n`;
+    });
+  } else {
+    text += '\nNo active sessions\n';
+  }
+  
+  // Sessions en attente
+  text += '\n\n⏳ *PENDING PAIRINGS* (' + sessions.pending.length + ')\n';
+  text += '━━━━━━━━━━━━━━━━━\n';
+  
+  if (sessions.pending.length > 0) {
+    sessions.pending.forEach((s, i) => {
+      text += `\n${i + 1}. *${s.name}*\n`;
+      text += `   🆔 ID: \`${s.id}\`\n`;
+      text += `   📱 Phone: ${s.phone}\n`;
+      text += `   🔑 Code: ${s.code}\n`;
+      const timeAgo = Math.floor((Date.now() - s.timestamp) / 1000);
+      text += `   ⏱️ Waiting: ${timeAgo}s ago\n`;
+    });
+  } else {
+    text += '\nNo pending sessions\n';
+  }
+  
+  text += '\n\n📝 *COMMANDS*\n';
+  text += '━━━━━━━━━━━━━━━━━\n';
+  text += '• *.addsession* <id> <name>\n';
+  text += '• *.pair* <id> <phone>\n';
+  text += '• *.stopsession* <id>\n';
+  
+  reply(text);
+  break;
+}
+
+case 'addsession': {
+  if (!isOwner) return reply('❌ Owner only!');
+  
+  const { createNewSession } = require('./index.js');
+  
+  // Format: .addsession sessionid SessionName
+  const args = text.split(' ');
+  const sessionId = args[0];
+  const sessionName = args.slice(1).join(' ');
+  
+  if (!sessionId || !sessionName) {
+    return reply(`❌ *Invalid format!*
+
+*Usage:*
+*.addsession* <session-id> <Session Name>
+
+*Example:*
+*.addsession* subbot1 My SubBot 1
+
+*Rules:*
+• Session ID: lowercase, no spaces
+• Session Name: any text`);
+  }
+  
+  reply('⏳ Creating new session...');
+  
+  const result = await createNewSession(sessionId.toLowerCase(), sessionName);
+  
+  if (result.success) {
+    reply(`✅ *Session Created!*
+
+🆔 ID: \`${result.sessionId}\`
+📝 Name: ${sessionName}
+
+*Next Step:*
+Use this command to get pairing code:
+*.pair ${result.sessionId} <phone-number>*
+
+*Example:*
+*.pair ${result.sessionId} +1234567890*`);
+  } else {
+    reply(`❌ *Failed to create session!*\n\nReason: ${result.message}`);
+  }
+  break;
+}
+
+case 'pair':
+case 'pairing': {
+  if (!isOwner) return reply('❌ Owner only!');
+  
+  const { generatePairingCode } = require('./index.js');
+  
+  // Format: .pair sessionid phoneNumber
+  const args = text.split(' ');
+  const sessionId = args[0];
+  const phoneNumber = args[1];
+  
+  if (!sessionId || !phoneNumber) {
+    return reply(`❌ *Invalid format!*
+
+*Usage:*
+*.pair* <session-id> <phone-number>
+
+*Example:*
+*.pair* subbot1 +1234567890
+
+*Note:* Include country code with +`);
+  }
+  
+  reply('⏳ Generating pairing code...');
+  
+  const result = await generatePairingCode(sessionId, phoneNumber);
+  
+  if (result.success) {
+    reply(`✅ *Pairing Code Generated!*
+
+🆔 Session: \`${result.sessionId}\`
+📱 Phone: ${result.phone}
+🔑 Code: *${result.code}*
+
+*Instructions:*
+1. Open WhatsApp on phone ${result.phone}
+2. Go to: Settings > Linked Devices
+3. Tap "Link a Device"
+4. Choose "Link with phone number"
+5. Enter code: *${result.code}*
+
+⏰ Code expires in 1 minute!`);
+  } else {
+    reply(`❌ *Failed to generate pairing code!*\n\nReason: ${result.message}`);
+  }
+  break;
+}
+
+case 'stopsession':
+case 'removesession': {
+  if (!isOwner) return reply('❌ Owner only!');
+  
+  const { stopSession } = require('./index.js');
+  
+  const sessionId = args[0];
+  
+  if (!sessionId) {
+    return reply(`❌ *Invalid format!*
+
+*Usage:*
+*.stopsession* <session-id>
+
+*Example:*
+*.stopsession* subbot1
+
+⚠️ This will logout and delete the session!`);
+  }
+  
+  reply('⏳ Stopping session...');
+  
+  const result = await stopSession(sessionId);
+  
+  if (result.success) {
+    reply(`✅ ${result.message}`);
+  } else {
+    reply(`❌ ${result.message}`);
+  }
+  break;
+}
+```
+
+### 3. **Exemple d'utilisation complète**
+
+```bash
+# 1. Démarrer le bot
+node index.js
+# Le bot principal démarre et demande le pairing code
+
+# 2. Une fois connecté, créer un sous-bot
+.addsession subbot1 Mon Premier SubBot
+
+# 3. Obtenir le pairing code
+.pair subbot1 +225XXXXXXXXX
+
+# 4. Scanner le code sur WhatsApp
+# Le bot se connectera automatiquement
+
+# 5. Voir toutes les sessions
+.sessions
+
+# 6. Ajouter un autre sous-bot
+.addsession subbot2 Deuxième SubBot
+.pair subbot2 +33XXXXXXXXX
+
+# 7. Supprimer un sous-bot
+.stopsession subbot1
+```
+
+### 4. **Avantages de cette approche**
+
+✅ **Sécurisé** : Seul le owner peut créer des sous-bots  
+✅ **Contrôlé** : Pairing uniquement via commande  
+✅ **Flexible** : Ajout/suppression dynamique après déploiement  
+✅ **Organisé** : Chaque session dans son dossier  
+✅ **Traçable** : Liste de toutes les sessions actives/en attente  
+✅ **Protection** : Impossible de supprimer le bot principal  
+
+Voilà ! Maintenant vous avez un système complet de multi-session avec pairing contrôlé ! 🎉
